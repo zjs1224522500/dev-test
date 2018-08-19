@@ -60,4 +60,6 @@ public class UserDto {
 
         return Objects.hash(id, name, introduction, groupNo);
     }
+
+
 }
