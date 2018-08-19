@@ -1,0 +1,43 @@
+package tech.shunzi.testdev.model;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "t_User")
+public class User {
+
+    @Id
+    @Column(name = "c_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    @Column(name ="c_name", length = 20)
+    private String name;
+
+    @Column(name = "c_desc")
+    private String desc;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+}
