@@ -61,5 +61,13 @@ public class UserDto {
         return Objects.hash(id, name, introduction, groupNo);
     }
 
-
+    @Override
+    public String toString() {
+        return "UserDto{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", introduction='" + introduction + '\'' +
+                ", groupNo=" + groupNo +
+                '}';
+    }
 }

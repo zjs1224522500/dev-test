@@ -1,12 +1,15 @@
 package tech.shunzi.testdev.service.impl;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserDto;
 import tech.shunzi.testdev.repo.UserRepository;
 import tech.shunzi.testdev.service.UserService;
+import tech.shunzi.testdev.util.ObjectFieldEmptyUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,8 +20,10 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDto saveUser(User user) {
-        return populate(userRepository.save(user));
+    public UserDto saveUser(UserDto userDto) {
+        User user = populate(userDto);
+        userRepository.save(user);
+        return populate(user);
     }
 
     @Override
@@ -35,11 +40,27 @@ public class UserServiceImpl implements UserService {
 
     public UserDto populate(User user) {
         UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
+        if (null != user.getId()) {
+            userDto.setId(user.getId());
+            userDto.setGroupNo(user.getId() % 10);
+        }
         userDto.setName(user.getName());
         userDto.setIntroduction(String.format("Hello, I am %s. And my id is %s. %s", userDto.getName(), userDto.getId(), user.getDesc()));
-        userDto.setGroupNo(user.getId() % 10);
         return userDto;
+    }
+
+    public User populate(UserDto userDto) {
+        List<String> whiteList = new ArrayList<>(1);
+        whiteList.add("id");
+        whiteList.add("groupNo");
+        List<String> emptyFieldsNames = ObjectFieldEmptyUtil.findEmptyFields(userDto, whiteList);
+        if (CollectionUtils.isNotEmpty(emptyFieldsNames)) {
+            throw new RuntimeException("Empty field :" + emptyFieldsNames.toString() + ". Please check the input.");
+        }
+        User user = new User();
+        user.setName(userDto.getName());
+        user.setDesc(userDto.getIntroduction());
+        return user;
     }
 
 }

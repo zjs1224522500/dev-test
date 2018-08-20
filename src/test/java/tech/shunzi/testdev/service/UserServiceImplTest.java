@@ -2,22 +2,33 @@ package tech.shunzi.testdev.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserDto;
 import tech.shunzi.testdev.repo.UserRepository;
 import tech.shunzi.testdev.service.impl.UserServiceImpl;
+import tech.shunzi.testdev.util.ObjectFieldEmptyUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.any;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@PrepareForTest(ObjectFieldEmptyUtil.class)
+@RunWith(PowerMockRunner.class)
 public class UserServiceImplTest {
 
     @Mock
@@ -87,5 +98,29 @@ public class UserServiceImplTest {
 
         // assert
         assertEquals(id, userDto.getId());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSaveUser() {
+
+        // Prepare data
+        UserDto user = new UserDto();
+        user.setName("shunzi");
+        user.setIntroduction("intro");
+        User model = new User();
+        model.setDesc("intro");
+        model.setName("shunzi");
+        model.setId(1);
+        List<String> stringList = new ArrayList<>();
+        stringList.add("name");
+
+        PowerMockito.mockStatic(ObjectFieldEmptyUtil.class);
+        PowerMockito.when(ObjectFieldEmptyUtil.findEmptyFields(anyObject(), anyList())).thenReturn(stringList);
+
+        // Act
+        UserDto userDto = userService.saveUser(user);
+
+        // Assert
+        assertEquals("shunzi", userDto.getName());
     }
 }
