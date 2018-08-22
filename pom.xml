@@ -75,6 +75,12 @@
             <version>2.0.0-beta.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.18.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
