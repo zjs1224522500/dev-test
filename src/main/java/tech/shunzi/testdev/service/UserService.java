@@ -1,6 +1,5 @@
 package tech.shunzi.testdev.service;
 
-import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserDto;
 
 import java.util.List;

@@ -1,14 +1,24 @@
 package tech.shunzi.testdev.model;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.domain.DomainEvents;
+import tech.shunzi.testdev.model.dto.UserSaveEvent;
+import tech.shunzi.testdev.service.UserService;
+
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "t_User")
-public class User {
+public class User implements Serializable {
 
     @Id
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "system-uuid")
+    @Column(name = "c_guid")
+    private String guid;
+
     @Column(name = "c_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     @Column(name ="c_name", length = 20)
@@ -16,6 +26,24 @@ public class User {
 
     @Column(name = "c_desc")
     private String desc;
+
+    @DomainEvents
+    UserSaveEvent publishEvent()
+    {
+        System.out.println("Start publishing user save event");
+        UserSaveEvent userSaveEvent = new UserSaveEvent();
+        userSaveEvent.setUser(this);
+        return userSaveEvent;
+    }
+
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
 
     public Integer getId() {
         return id;

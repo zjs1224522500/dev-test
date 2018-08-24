@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserDto;
 import tech.shunzi.testdev.service.UserService;
 
@@ -22,5 +22,10 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> findAll() {
         return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDto> createUser(UserDto userDto) {
+        return new ResponseEntity<>(userService.saveUser(userDto), HttpStatus.OK);
     }
 }

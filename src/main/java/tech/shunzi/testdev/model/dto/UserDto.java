@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class UserDto {
 
-    private int id;
+    private String guid;
+
+    private Integer id;
 
     private String name;
 
@@ -12,11 +14,19 @@ public class UserDto {
 
     public int groupNo;
 
-    public int getId() {
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

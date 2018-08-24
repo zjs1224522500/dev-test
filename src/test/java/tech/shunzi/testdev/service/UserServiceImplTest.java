@@ -80,7 +80,7 @@ public class UserServiceImplTest {
     public void testGetUserById() {
 
         // prepare data
-        int id = 1;
+        Integer id = 1;
         User user = new User();
         user.setId(id);
         user.setName("shunzi");

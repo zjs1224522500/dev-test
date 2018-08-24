@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     public User populate(UserDto userDto) {
         List<String> whiteList = new ArrayList<>(1);
-        whiteList.add("id");
+        whiteList.add("guid");
         whiteList.add("groupNo");
         List<String> emptyFieldsNames = ObjectFieldEmptyUtil.findEmptyFields(userDto, whiteList);
         if (CollectionUtils.isNotEmpty(emptyFieldsNames)) {
@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setName(userDto.getName());
         user.setDesc(userDto.getIntroduction());
+        user.setId(userDto.getId());
         return user;
     }
 
