@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserDto;
+import tech.shunzi.testdev.publisher.EventPublisher;
 import tech.shunzi.testdev.repo.UserRepository;
 import tech.shunzi.testdev.service.UserService;
 import tech.shunzi.testdev.util.ObjectFieldEmptyUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +21,15 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EventPublisher eventPublisher;
+
     @Override
     public UserDto saveUser(UserDto userDto) {
         User user = populate(userDto);
         userRepository.save(user);
+        eventPublisher.publishByPublisher(user);
+        System.out.println(new Date() + "Save method go on");
         return populate(user);
     }
 

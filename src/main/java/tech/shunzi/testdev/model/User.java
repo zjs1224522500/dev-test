@@ -1,12 +1,14 @@
 package tech.shunzi.testdev.model;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
 import tech.shunzi.testdev.model.dto.UserSaveEvent;
-import tech.shunzi.testdev.service.UserService;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "t_User")
@@ -28,12 +30,23 @@ public class User implements Serializable {
     private String desc;
 
     @DomainEvents
-    UserSaveEvent publishEvent()
+    List<UserSaveEvent> publishEvent()
     {
         System.out.println("Start publishing user save event");
-        UserSaveEvent userSaveEvent = new UserSaveEvent();
-        userSaveEvent.setUser(this);
-        return userSaveEvent;
+
+        UserSaveEvent userSaveEvent = new UserSaveEvent(this,this);
+        System.out.println(userSaveEvent.getUser());
+        UserSaveEvent testAnotherEvent = new UserSaveEvent(this,this);
+        List<UserSaveEvent> events = new ArrayList<>();
+        events.add(userSaveEvent);
+        events.add(testAnotherEvent);
+        return events;
+    }
+
+    @AfterDomainEventPublication
+    void afterPublish()
+    {
+        System.out.println("After publishing user save event");
     }
 
 
@@ -67,5 +80,15 @@ public class User implements Serializable {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "guid='" + guid + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", desc='" + desc + '\'' +
+                '}';
     }
 }

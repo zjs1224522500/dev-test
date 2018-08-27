@@ -1,6 +1,7 @@
 package tech.shunzi.testdev.listener;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -8,7 +9,7 @@ import tech.shunzi.testdev.model.dto.UserSaveEvent;
 import tech.shunzi.testdev.service.UserService;
 
 @Component
-public class EventListener {
+public class UserSaveEventListener {
 
     @Autowired
     private UserService userService;
@@ -16,6 +17,18 @@ public class EventListener {
     @Async
     @TransactionalEventListener
     public void handleEvent(UserSaveEvent userSaveEvent)
+    {
+        sout(userSaveEvent);
+    }
+
+    @Async
+    @EventListener
+    public void handleOrdinaryEvent(UserSaveEvent userSaveEvent)
+    {
+        sout(userSaveEvent);
+    }
+
+    private void sout(UserSaveEvent userSaveEvent)
     {
         System.out.println(userService.findAllUsers());
         System.out.println("Listener received user save event.");
