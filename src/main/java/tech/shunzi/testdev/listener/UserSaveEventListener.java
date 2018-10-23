@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import tech.shunzi.testdev.model.dto.UserSaveEvent;
 import tech.shunzi.testdev.service.UserService;
@@ -15,16 +16,12 @@ public class UserSaveEventListener {
     private UserService userService;
 
     @Async
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEvent(UserSaveEvent userSaveEvent)
     {
-        sout(userSaveEvent);
-    }
-
-    @Async
-    @EventListener
-    public void handleOrdinaryEvent(UserSaveEvent userSaveEvent)
-    {
+        System.out.println("*********************************");
+        System.out.println("** Transaction Event Listener ");
+        System.out.println("*********************************");
         sout(userSaveEvent);
     }
 

@@ -1,5 +1,6 @@
 package tech.shunzi.testdev.model;
 
+import com.alibaba.fastjson.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
@@ -37,6 +38,7 @@ public class User implements Serializable {
         UserSaveEvent userSaveEvent = new UserSaveEvent(this,this);
         System.out.println(userSaveEvent.getUser());
         UserSaveEvent testAnotherEvent = new UserSaveEvent(this,this);
+        //testAnotherEvent.setValue(JSONObject);
         List<UserSaveEvent> events = new ArrayList<>();
         events.add(userSaveEvent);
         events.add(testAnotherEvent);

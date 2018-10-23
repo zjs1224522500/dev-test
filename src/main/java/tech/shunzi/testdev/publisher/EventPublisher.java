@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserSaveEvent;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class EventPublisher {
 
@@ -24,6 +27,16 @@ public class EventPublisher {
         System.out.println("Publish custom event by publisher");
         UserSaveEvent userSaveEvent = new UserSaveEvent(this,user);
         publisher.publishEvent(userSaveEvent);
+    }
+
+    public void publishEvents(List<User> userList) {
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("Publish user list event by publisher");
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++");
+        List<UserSaveEvent> events = userList.stream().map(user -> {
+            return new UserSaveEvent(this,user);
+        }).collect(Collectors.toList());
+        publisher.publishEvent(events);
     }
 
 }

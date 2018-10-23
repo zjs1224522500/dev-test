@@ -1,11 +1,14 @@
 package tech.shunzi.testdev.model.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.context.ApplicationEvent;
 import tech.shunzi.testdev.model.User;
 
 public class UserSaveEvent extends ApplicationEvent {
 
     private User user;
+
+    private JSONObject value;
 
     public UserSaveEvent(Object source, User user) {
         super(source);
@@ -24,5 +27,11 @@ public class UserSaveEvent extends ApplicationEvent {
         this.user = user;
     }
 
+    public JSONObject getValue() {
+        return value;
+    }
 
+    public void setValue(JSONObject value) {
+        this.value = value;
+    }
 }

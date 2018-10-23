@@ -25,7 +25,7 @@ public class AsynchronousSpringEventsConfig implements AsyncConfigurer {
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(5);
-        taskExecutor.setMaxPoolSize(10);
+        taskExecutor.setMaxPoolSize(50);
         taskExecutor.setQueueCapacity(25);
         taskExecutor.initialize();
 

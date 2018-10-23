@@ -1,5 +1,9 @@
 package tech.shunzi.testdev.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,14 +14,16 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.util.NumberUtils;
 import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserDto;
 import tech.shunzi.testdev.repo.UserRepository;
 import tech.shunzi.testdev.service.impl.UserServiceImpl;
 import tech.shunzi.testdev.util.ObjectFieldEmptyUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.stream.Location;
+import java.util.*;
 
 import static org.hamcrest.Matchers.any;
 import static org.junit.Assert.assertEquals;
@@ -123,4 +129,76 @@ public class UserServiceImplTest {
         // Assert
         assertEquals("shunzi", userDto.getName());
     }
+
+    @Test
+    public void testConvertTime() {
+        User user = new User();
+        user.setName("Elvis");
+        user.setId(1);
+        user.setDesc("desc");
+        user.setGuid("guid");
+
+        long start = System.currentTimeMillis();
+        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(user));
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
+
+        long start2 = System.currentTimeMillis();
+        Map<Object, Object> map = new BeanMap(user);
+        long end2 = System.currentTimeMillis();
+        System.out.println(end2 - start2);
+        System.out.println(map.get("name"));
+    }
+
+    @Test
+    public void testDateToString() {
+        Date date = new Date();
+        System.out.println(date.getTime());
+        System.out.println(date);
+        System.out.println(date.toString());
+        System.out.println(org.apache.commons.lang3.math.NumberUtils.toDouble(String.valueOf(date.getTime())));
+    }
+
+    @Test
+    public void convertExtension() {
+        String s = "N_EX_13";
+        s = s.replace("_", "");//NEX13
+        int flagIndex = s.indexOf("E");
+        s = (new StringBuilder()).append(s.substring(0, flagIndex).toLowerCase()).append("E").append(s.substring(flagIndex + 1).toLowerCase()).toString();
+        System.out.println(s);
+    }
+
+    @Test
+    public void test() {
+        Scanner in = new Scanner(System.in);
+        String location = in.nextLine();
+        String[] xy = location.split(",");
+        Double pX = Double.valueOf(xy[0]);
+        Double pY = Double.valueOf(xy[1]);
+        String range = in.nextLine();
+        String[] rangeXy = range.split(",");
+        List<Double[]> locations = new ArrayList<>();
+        for (int i = 0; i < rangeXy.length; ) {
+            if (i % 2 == 0) {
+                Double x = Double.valueOf(rangeXy[i]);
+                Double y = Double.valueOf(rangeXy[i + 1]);
+                Double[] edge = {x, y};
+                locations.add(edge);
+            }
+            i += 2;
+        }
+        System.out.println(pX + "   " + pY);
+        System.out.println(locations);
+
+    }
+
+    @Test
+    public void testNumberFormat() {
+        String one = "123,456,789.02";
+        String two = "123.456.789,02";
+
+        String format = one.replaceAll(",", "!").replaceAll("\\.", ",").replaceAll("!", ".");
+        assertEquals(format, two);
+    }
+
 }

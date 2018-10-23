@@ -7,16 +7,18 @@ import tech.shunzi.testdev.model.User;
 import tech.shunzi.testdev.model.dto.UserDto;
 import tech.shunzi.testdev.publisher.EventPublisher;
 import tech.shunzi.testdev.repo.UserRepository;
+import tech.shunzi.testdev.service.TestMultiInject;
 import tech.shunzi.testdev.service.UserService;
 import tech.shunzi.testdev.util.ObjectFieldEmptyUtil;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, TestMultiInject {
 
     @Autowired
     private UserRepository userRepository;
@@ -24,12 +26,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EventPublisher eventPublisher;
 
+    @Transactional
     @Override
     public UserDto saveUser(UserDto userDto) {
         User user = populate(userDto);
         userRepository.save(user);
         eventPublisher.publishByPublisher(user);
-        System.out.println(new Date() + "Save method go on");
+
+        System.out.println(new Date() + "+++++++++++Save method go on");
         return populate(user);
     }
 
