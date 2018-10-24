@@ -21,6 +21,7 @@
 
 ##### service/dao unit test
 - Before: You must init mockito in @Before of JUnit.
+
 ```Java
 @Before
 public void setUp() throws Exception
@@ -129,9 +130,11 @@ public class UserServiceImplTest {
     }
 }
 ```
+
 #### SpringTest
 ##### mockMvc unit test
 - Before: You must init the MockMvc and bind it to controller class.
+
 ```Java
 private HelloController helloController;
 private MockMvc mockMvc;
@@ -165,6 +168,7 @@ String data = mockMvc .perform(delete(requestURI).contentType(MediaType.APPLICAT
 ```
 
 - Example:
+
 ```Java
 package tech.shunzi.testdev.controller;
 
@@ -245,6 +249,7 @@ public class UserControllerTest {
         - `PowerMockito.mockStatic()`  // mock static class
         - `PowerMocckito.when()` // mock static method invoke
 - Example:
+
 ```Java
 @PrepareForTest(ObjectFieldEmptyUtil.class)
 @RunWith(PowerMockRunner.class)
@@ -286,6 +291,7 @@ public class UserServiceImplTest {
     }
 }
 ```
+
 ##### Caution:
 - Please refer [PowerMock Github Repo](https://github.com/powermock/powermock) version issues.
 - It must match `Mockito` version
@@ -304,6 +310,7 @@ public class UserServiceImplTest {
 
 #### 代码实例：
 - BaseIntegrationTest
+
 ```Java
 package tech.shunzi.testdev.integration.test;
 
@@ -338,7 +345,8 @@ public abstract class BaseIntegrationTest {
 }
 ```
 
-- 其余具体的 `Integration Test Class`均可集成 `BaseIntegrationTest`
+- 其余具体的 `Integration Test Class`均可继承 `BaseIntegrationTest`
+
 ```Java
 package tech.shunzi.testdev.integration.test;
 
@@ -364,6 +372,7 @@ public class UserControllerIntTest extends BaseIntegrationTest {
 ```
 
 - 针对 Service 和 Dao 层可以不加载相关 Web 环境
+
 ```Java
 package tech.shunzi.testdev.integration.test;
 
