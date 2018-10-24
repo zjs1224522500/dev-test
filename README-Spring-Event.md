@@ -1,12 +1,7 @@
 ### Spring Event & Application
-```
-sequenceDiagram
-Listener->>Spring Context: Listen Event
-Observer->>Publisher: Action Trigger
-Publisher->>Spring Context: Publish Event
-Spring Context->>Listener: Event
-Listener->>Event Process: Event
-```
+
+![image](https://raw.githubusercontent.com/zjs1224522500/dev-test/master/src/main/resources/pic/Spring%20events.png)
+
 #### Event Publisher
 ##### 1. @DomainEvents  - Spring Data JPA
 - Annotate method in **Domain Model** class.
