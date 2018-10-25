@@ -138,42 +138,6 @@ public class AccountEventPublisher {
     }
 ```
 
-### Application in EMS
-#### Demand
-- Config event type, condition, and notification details for obserer model.
-- Create event monitor log and send notification when condition match.
-    - Entitlement/Consumption Save Event
-    - Entitlement/Consumption Become Valid/Invalid Event
-- Send notificaiton and update event log status in outbound transaction.
-
-
-#### Difficulties (Some of difficulties are also problems in EMS)
-- The same domain model classes are defined in many services.
-- The ways to save entitlement/consumption are divided into `JpaRepository.save(...)` and **native sql** (`INSERT/UPDATE ...` and some **Stored Procedures**) execution.
-- The Entitlement/Consumption save operation exists in many services.
-- Common event trigger, event mnonitor create and send notification logic need to be abstracted in common lib.
-    - MQ sender interface and implementation class.
-    - Maven circular dependency - Security Enterprise Feature Util.
-    - Async process - Multi tenant and authorization for feign call.
-- Performance:
-    - Guava cache for event condition query.
-    - Collect data to reduce feign call times.
-    - Process job notifictaions in batch.
-
-
-#### Design
-##### Event Trigger and Create event monitor log
-- Entitlement/Consumption Save Event
-
-![image](https://github.wdf.sap.corp/raw/I348910/Session/master/Save%20Event.png)
-
-- Entitlement/Consumption Become Valid/Invalid Event
-![image](https://github.wdf.sap.corp/raw/I348910/Session/master/Valid%20or%20Invalid%20Event.png)
-
-##### OutboundProcessor 
-
-![image](https://github.wdf.sap.corp/raw/I348910/Session/master/Event%20notification%20in%20EMS.jpg)
-
 ##### Reference :
 [[1] Baeldung: How to use events in Spring](https://www.baeldung.com/spring-events)  
 [[2] Spring Blog: Better application events in Spring Framework 4.2
