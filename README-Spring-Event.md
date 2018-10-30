@@ -41,6 +41,7 @@
 ![image](http://5b0988e595225.cdn.sohucs.com/images/20171128/7c5a95aa8ee348d9b7dff8417e4edb4e.jpeg)
 
 ### Spring Events
+```
 ![image](https://raw.githubusercontent.com/zjs1224522500/dev-test/master/src/main/resources/pic/Spring%20events.png)
 
 #### Event Publisher
@@ -138,6 +139,125 @@ public class AccountEventPublisher {
     }
 ```
 
+#### Explore
+##### class SimpleApplicationEventMulticaster
+```Java
+    @Override
+	public void multicastEvent(ApplicationEvent event) {
+		multicastEvent(event, resolveDefaultEventType(event));
+	}
+
+	@Override
+	public void multicastEvent(final ApplicationEvent event, ResolvableType eventType) {
+		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+		for (final ApplicationListener<?> listener : getApplicationListeners(event, type)) {
+			Executor executor = getTaskExecutor();
+			if (executor != null) {
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						invokeListener(listener, event);
+					}
+				});
+			}
+			else {
+				invokeListener(listener, event);
+			}
+		}
+	}
+```
+##### abstract class AbstractApplicationContext 
+```Java
+	protected void publishEvent(Object event, ResolvableType eventType) {
+		Assert.notNull(event, "Event must not be null");
+		if (logger.isTraceEnabled()) {
+			logger.trace("Publishing event in " + getDisplayName() + ": " + event);
+		}
+
+		// Decorate event as an ApplicationEvent if necessary
+		ApplicationEvent applicationEvent;
+		if (event instanceof ApplicationEvent) {
+			applicationEvent = (ApplicationEvent) event;
+		}
+		else {
+			applicationEvent = new PayloadApplicationEvent<Object>(this, event);
+			if (eventType == null) {
+				eventType = ((PayloadApplicationEvent) applicationEvent).getResolvableType();
+			}
+		}
+
+		// Multicast right now if possible - or lazily once the multicaster is initialized
+		if (this.earlyApplicationEvents != null) {
+			this.earlyApplicationEvents.add(applicationEvent);
+		}
+		else {
+			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
+		}
+
+		// Publish event via parent context as well...
+		if (this.parent != null) {
+			if (this.parent instanceof AbstractApplicationContext) {
+				((AbstractApplicationContext) this.parent).publishEvent(event, eventType);
+			}
+			else {
+				this.parent.publishEvent(event);
+			}
+		}
+	}
+```
+
+### Application in EMS
+#### Demand
+- Config event type, condition, and notification details for obserer model.
+- Create event monitor log and send notification when condition match.
+    - Entitlement/Consumption Save Event
+    - Entitlement/Consumption Become Valid/Invalid Event
+- Send notificaiton and update event log status in outbound transaction.
+
+
+#### Difficulties (Some of difficulties are also problems in EMS)
+- The same domain model classes are defined in many services.
+- The ways to save entitlement/consumption are divided into `JpaRepository.save(...)` and **native sql** (`INSERT/UPDATE ...` and some **Stored Procedures**) execution.
+- The Entitlement/Consumption save operation exists in many services.
+- Common event trigger, event mnonitor create and send notification logic need to be abstracted in common lib.
+    - MQ sender interface and implementation class.
+    - Maven circular dependency - Security Enterprise Feature Util.
+    - Async process - Multi tenant and authorization for feign call.
+- Performance:
+    - Guava cache for event condition query.
+    - Collect data to reduce feign call times.
+    - Process job notifictaions in batch.
+
+
+#### Design
+##### Event Trigger and Create event monitor log
+- Entitlement/Consumption Save Event
+
+![image](https://github.wdf.sap.corp/raw/I348910/Session/master/Save%20Event.png)
+
+- Entitlement/Consumption Become Valid/Invalid Event
+![image](https://github.wdf.sap.corp/raw/I348910/Session/master/Valid%20or%20Invalid%20Event.png)
+
+##### OutboundProcessor 
+
+![image](https://github.wdf.sap.corp/raw/I348910/Session/master/Event%20notification%20in%20EMS.jpg)
+
+
+#### Practice
+##### 1. Config
+- Config communication channel/background job.
+- Config event type, conditions and notification ways.
+
+##### 2. Update/Check
+- Update entitlement/consumption (manual edit/API)
+- Background jobs check entitlement/consumption valid/invalid.
+
+##### 3. Event Trigger & Notification Send
+- Check event monitor log status.
+- Check outbound monitor log.
+- Check outbound destination output.
+
+
 ##### Reference :
 [[1] Baeldung: How to use events in Spring](https://www.baeldung.com/spring-events)  
 [[2] Spring Blog: Better application events in Spring Framework 4.2
@@ -149,4 +269,5 @@ public class AccountEventPublisher {
 [[7] luohanguo: The Obeserver Design Pattern](https://www.cnblogs.com/luohanguo/p/7825656.html)  
 [[8] miaoyu: Differences between Observer and Publish-Subscribe Pattern](https://www.sohu.com/a/207062452_464084)  
 [[9] Github Source Code Example of Spring Events by Elvis](https://github.com/zjs1224522500/dev-test)  
-[[10] Github Source Code Example of Observer Design Pattern by Elvis](https://github.com/zjs1224522500/data-structure-and-arithmetic/tree/master/design_patterns/src/me/elvis/common/design/observer/another)
+[[10] Github Source Code Example of Observer Design Pattern by Elvis](https://github.com/zjs1224522500/data-structure-and-arithmetic/tree/master/design_patterns/src/me/elvis/common/design/observer/another)  
+[[11] CSDN Blog: Spring Event System](https://blog.csdn.net/caihaijiang/article/details/7460888)
