@@ -28,8 +28,7 @@ public class AccountController {
     }
 
     @PostMapping("/event")
-    public ResponseEntity<Account> saveEvent(@RequestBody Account account)
-    {
+    public ResponseEntity<Account> saveEvent(@RequestBody Account account) throws InterruptedException {
         return new ResponseEntity(accountService.saveAccountWithPublisher(account), HttpStatus.OK);
     }
 

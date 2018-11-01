@@ -10,5 +10,5 @@ public interface AccountService {
 
     List<Account> findAll();
 
-    Account saveAccountWithPublisher(Account account);
+    Account saveAccountWithPublisher(Account account) throws InterruptedException;
 }

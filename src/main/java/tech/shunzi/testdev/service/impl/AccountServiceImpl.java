@@ -31,13 +31,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account saveAccountWithPublisher(Account account)
-    {
+    public Account saveAccountWithPublisher(Account account) throws InterruptedException {
         Account accountResult = save(account);
+        System.out.println("=====================Before Publish================");
         publisher.publishEventByContext(account);
-        publisher.publishEventByPublisher(account);
-        publisher.publishApplicationEventByContext(account);
-        publisher.publishApplicationEventByPublisher(account);
+        System.out.println("=====================After Publish================");
+//        publisher.publishEventByPublisher(account);
+//        publisher.publishApplicationEventByContext(account);
+//        publisher.publishApplicationEventByPublisher(account);
         return accountResult;
     }
 

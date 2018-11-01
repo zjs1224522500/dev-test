@@ -1,6 +1,9 @@
 package tech.shunzi.testdev.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -11,14 +14,14 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsynchronousSpringEventsConfig implements AsyncConfigurer {
 
-//    @Bean(name = "applicationEventMulticaster")
-//    public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
-//        SimpleApplicationEventMulticaster eventMulticaster
-//                = new SimpleApplicationEventMulticaster();
-//
-//        eventMulticaster.setTaskExecutor(new ThreadPoolTaskExecutor());
-//        return eventMulticaster;
-//    }
+    @Bean(name = "applicationEventMulticaster")
+    public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
+        SimpleApplicationEventMulticaster eventMulticaster
+                = new SimpleApplicationEventMulticaster();
+
+        eventMulticaster.setTaskExecutor(getAsyncExecutor());
+        return eventMulticaster;
+    }
 
 
     @Override
