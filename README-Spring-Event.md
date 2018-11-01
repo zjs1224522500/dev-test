@@ -107,6 +107,8 @@ public class AccountEventPublisher {
     }
 }
 ```
+- Publisher can publish any Object as Event, because Spring will help to use **PayloadApplicationEvent** to package the object.
+
 
 #### Event Listener
 ##### 1. @EventListener
@@ -140,7 +142,8 @@ public class AccountEventPublisher {
 ```
 
 #### Explore
-##### class SimpleApplicationEventMulticaster
+##### How to event process method in listener class
+- class **SimpleApplicationEventMulticaster**
 ```Java
     @Override
 	public void multicastEvent(ApplicationEvent event) {
@@ -153,6 +156,7 @@ public class AccountEventPublisher {
 		for (final ApplicationListener<?> listener : getApplicationListeners(event, type)) {
 			Executor executor = getTaskExecutor();
 			if (executor != null) {
+			    // new Runnable(){...} just define Runnable variable  
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
@@ -166,7 +170,126 @@ public class AccountEventPublisher {
 		}
 	}
 ```
-##### abstract class AbstractApplicationContext 
+- As for **executor** in **SimpleApplicationEventMulticaster**, it is **global executor** for all Spring Event Listeners. So if we config an async executor and inject it to multicaster, all listeners will process event async.
+```Java
+@Configuration
+public class AsynchronousSpringEventsConfig implements AsyncConfigurer {
+
+    @Bean(name = "applicationEventMulticaster")
+    public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
+        SimpleApplicationEventMulticaster eventMulticaster
+                = new SimpleApplicationEventMulticaster();
+        // Inject the ThreadPoolTaskExecutor
+        eventMulticaster.setTaskExecutor(getAsyncExecutor());
+        return eventMulticaster;
+    }
+
+
+    @Override
+    public Executor getAsyncExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(5);
+        taskExecutor.setMaxPoolSize(50);
+        taskExecutor.setQueueCapacity(25);
+        taskExecutor.initialize();
+
+        return taskExecutor;
+    }
+}
+```
+- But if we want only several listeners to process event async, we can use **@Async** annotation and add some thread pool config. And **@Async** uses **CglibAopDynamicProxy** and **AsyncExecutionInterceptor** to find suitable executors to execute the annotated method.
+```Java
+public class AsyncExecutionInterceptor extends ... {
+    @Nullable
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+        Class<?> targetClass = invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null;
+        Method specificMethod = ClassUtils.getMostSpecificMethod(invocation.getMethod(), targetClass);
+        Method userDeclaredMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
+        // Find executors configured in configuration class.
+        AsyncTaskExecutor executor = this.determineAsyncExecutor(userDeclaredMethod);
+        if (executor == null) {
+            throw new IllegalStateException("No executor specified and no default executor set on AsyncExecutionInterceptor either");
+        } else {
+            Callable<Object> task = () -> {
+                try {
+                    Object result = invocation.proceed();
+                    if (result instanceof Future) {
+                        return ((Future)result).get();
+                    }
+                } catch (ExecutionException var4) {
+                    this.handleError(var4.getCause(), userDeclaredMethod, invocation.getArguments());
+                } catch (Throwable var5) {
+                    this.handleError(var5, userDeclaredMethod, invocation.getArguments());
+                }
+
+                return null;
+            };
+            return this.doSubmit(task, executor, invocation.getMethod().getReturnType());
+        }
+    }
+}
+```
+
+- How does ThreadPoolTaskExecutor execute method async, we can refer the source code in **ThreadPoolExecutor.class**
+```Java
+    /**
+     * Executes the given task sometime in the future.  The task
+     * may execute in a new thread or in an existing pooled thread.
+     *
+     * If the task cannot be submitted for execution, either because this
+     * executor has been shutdown or because its capacity has been reached,
+     * the task is handled by the current {@code RejectedExecutionHandler}.
+     *
+     * @param command the task to execute
+     * @throws RejectedExecutionException at discretion of
+     *         {@code RejectedExecutionHandler}, if the task
+     *         cannot be accepted for execution
+     * @throws NullPointerException if {@code command} is null
+     */
+    public void execute(Runnable command) {
+        if (command == null)
+            throw new NullPointerException();
+        /*
+         * Proceed in 3 steps:
+         *
+         * 1. If fewer than corePoolSize threads are running, try to
+         * start a new thread with the given command as its first
+         * task.  The call to addWorker atomically checks runState and
+         * workerCount, and so prevents false alarms that would add
+         * threads when it shouldn't, by returning false.
+         *
+         * 2. If a task can be successfully queued, then we still need
+         * to double-check whether we should have added a thread
+         * (because existing ones died since last checking) or that
+         * the pool shut down since entry into this method. So we
+         * recheck state and if necessary roll back the enqueuing if
+         * stopped, or start a new thread if there are none.
+         *
+         * 3. If we cannot queue task, then we try to add a new
+         * thread.  If it fails, we know we are shut down or saturated
+         * and so reject the task.
+         */
+        int c = ctl.get();
+        if (workerCountOf(c) < corePoolSize) {
+            if (addWorker(command, true))
+                return;
+            c = ctl.get();
+        }
+        if (isRunning(c) && workQueue.offer(command)) {
+            int recheck = ctl.get();
+            if (! isRunning(recheck) && remove(command))
+                reject(command);
+            else if (workerCountOf(recheck) == 0)
+                addWorker(null, false);
+        }
+        else if (!addWorker(command, false))
+            reject(command);
+    }
+```
+
+
+##### Where to call method multicastEvent()
+- abstract class **AbstractApplicationContext** 
 ```Java
 	protected void publishEvent(Object event, ResolvableType eventType) {
 		Assert.notNull(event, "Event must not be null");
