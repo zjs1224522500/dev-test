@@ -23,16 +23,16 @@ public class Account {
     @Column(name = "c_email")
     private String email;
 
-//    @DomainEvents
-//    AccountSaveEvent accountSaveEvent()
-//    {
-//        AccountSaveEvent accountSaveEvent = new AccountSaveEvent();
-//        accountSaveEvent.setAccount(this);
-//        accountSaveEvent.setEventType("AccountSaveEventByJPA");
-//        System.out.println("**********************************************");
-//        System.out.println("@DomainEvents starts to publish events.");
-//        return accountSaveEvent;
-//    }
+    @DomainEvents
+    AccountSaveEvent accountSaveEvent()
+    {
+        AccountSaveEvent accountSaveEvent = new AccountSaveEvent();
+        accountSaveEvent.setAccount(this);
+        accountSaveEvent.setEventType("AccountSaveEventByJPA");
+        System.out.println("**********************************************");
+        System.out.println("@DomainEvents starts to publish events.");
+        return accountSaveEvent;
+    }
 //
 //    @AfterDomainEventPublication
 //    void callbackMethod() {

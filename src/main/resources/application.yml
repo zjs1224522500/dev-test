@@ -21,3 +21,4 @@ spring:
 logging:
   level:
     root: DEBUG
+trace: true

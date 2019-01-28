@@ -11,15 +11,25 @@ import tech.shunzi.testdev.model.dto.AccountSaveEvent;
 @Component
 public class AccountSaveEventListener {
 
-//    @Async
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handleEvent(AccountSaveEvent accountSaveEvent) throws InterruptedException {
         System.out.println("======================================");
-        System.out.println("Listener listened AccountSaveEvent");
+        System.out.println("Listener One listened AccountSaveEvent");
         Thread.sleep(3000);
         System.out.println(accountSaveEvent.getEventType());
         System.out.println("======================================");
 
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    public void anotherHandle(AccountSaveEvent accountSaveEvent) throws InterruptedException {
+        System.out.println("======================================");
+        System.out.println("Listener Two listened AccountSaveEvent");
+        Thread.sleep(5000);
+        System.out.println(accountSaveEvent.getEventType());
+        System.out.println("======================================");
     }
 
 //    @EventListener(condition = "#accountSaveApplicationEvent.valid")
