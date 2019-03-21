@@ -201,4 +201,16 @@ public class UserServiceImplTest {
         assertEquals(format, two);
     }
 
+    @Test
+    public void testAdd()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            System.out.println("i : " + i);
+            for (int index = i; index < 5; index ++) {
+                System.out.println("index : " + index);
+            }
+        }
+    }
+
 }

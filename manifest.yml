@@ -1,0 +1,4 @@
+---
+applications:
+- name: ems-outbound-dev-test-elvis
+  path: target/dev-test-1.jar

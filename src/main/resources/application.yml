@@ -20,5 +20,4 @@ spring:
       path: /h2-console
 logging:
   level:
-    root: DEBUG
-trace: true
+    root: INFO
