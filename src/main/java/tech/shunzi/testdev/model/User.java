@@ -1,6 +1,5 @@
 package tech.shunzi.testdev.model;
 
-import com.alibaba.fastjson.JSONObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
@@ -29,6 +28,10 @@ public class User implements Serializable {
 
     @Column(name = "c_desc")
     private String desc;
+
+    @Column(name = "c_address_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Address> addresses;
 
     @DomainEvents
     List<UserSaveEvent> publishEvent()

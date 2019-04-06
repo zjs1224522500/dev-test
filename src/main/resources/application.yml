@@ -11,7 +11,7 @@ spring:
   jpa:
     database: h2
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     generate-ddl: true
   h2:
@@ -20,4 +20,4 @@ spring:
       path: /h2-console
 logging:
   level:
-    root: INFO
+    root: DEBUG

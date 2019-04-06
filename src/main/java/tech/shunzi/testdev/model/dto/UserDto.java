@@ -1,7 +1,10 @@
 package tech.shunzi.testdev.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Objects;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
     private String guid;

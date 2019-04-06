@@ -1,16 +1,22 @@
 package tech.shunzi.testdev.service.impl;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import tech.shunzi.testdev.model.Address;
 import tech.shunzi.testdev.model.User;
+import tech.shunzi.testdev.model.dto.AddressDto;
 import tech.shunzi.testdev.model.dto.UserDto;
 import tech.shunzi.testdev.publisher.EventPublisher;
+import tech.shunzi.testdev.repo.AddressRepo;
 import tech.shunzi.testdev.repo.UserRepository;
 import tech.shunzi.testdev.service.TestMultiInject;
 import tech.shunzi.testdev.service.UserService;
 import tech.shunzi.testdev.util.ObjectFieldEmptyUtil;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +28,9 @@ public class UserServiceImpl implements UserService, TestMultiInject {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AddressRepo addressRepo;
 
     @Autowired
     private EventPublisher eventPublisher;
@@ -47,6 +56,28 @@ public class UserServiceImpl implements UserService, TestMultiInject {
     @Override
     public UserDto findSingleUser(int id) {
         return populate(userRepository.findById(id));
+    }
+
+    @Override
+    public AddressDto findAddressDto(String userGuid) {
+        AddressDto addressDto = new AddressDto();
+        addressDto.setUserDto(populate(userRepository.getOne(userGuid)));
+        return addressDto;
+    }
+
+    @Override
+    public AddressDto addAddress(AddressDto addressDto) {
+        Address addressModel = new Address();
+        String userGuid = addressDto.getUserDto().getGuid();
+        User user = null;
+        try {
+            user = userRepository.getOne(userGuid);
+        } catch (EntityNotFoundException | NullPointerException exception) {
+            throw exception;
+        }
+        addressModel.setUser(user);
+        addressRepo.save(addressModel);
+        return findAddressDto(userGuid);
     }
 
     public UserDto populate(User user) {
