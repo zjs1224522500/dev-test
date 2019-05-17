@@ -1,6 +1,7 @@
 package tech.shunzi.testdev.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.BeanUtils;
@@ -210,6 +211,76 @@ public class UserServiceImplTest {
             for (int index = i; index < 5; index ++) {
                 System.out.println("index : " + index);
             }
+        }
+    }
+
+    @Test
+    public void testConvertJsonArray()
+    {
+//        String json = "[{\"attribute\":1},{\"attribute\":2}]";
+//        List<TestModel> models = JSONArray.parseArray(json, TestModel.class);
+//        models.forEach(model -> System.out.println(model.toString()));
+
+        String newJson = "{\"name\":\"first\", \"students\":[{\"name\":\"Tom\", \"age\":18}, {\"name\":\"John\", \"age\": 21}]}";
+        ClassModel classModel = JSONObject.parseObject(newJson, ClassModel.class);
+        System.out.println(classModel.getStudents().get(0).getName());
+
+
+    }
+
+    private static class ClassModel
+    {
+        private String name;
+        private List<Student> students;
+
+        public List<Student> getStudents() {
+            return students;
+        }
+
+        public void setStudents(List<Student> students) {
+            this.students = students;
+        }
+    }
+
+    private static class Student
+    {
+        private String name;
+        private int age;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+    }
+
+    private static class TestModel
+    {
+        private int attribute;
+
+        public int getAttribute() {
+            return attribute;
+        }
+
+        public void setAttribute(int attribute) {
+            this.attribute = attribute;
+        }
+
+        @Override
+        public String toString() {
+            return "TestModel{" +
+                    "attribute=" + attribute +
+                    '}';
         }
     }
 
