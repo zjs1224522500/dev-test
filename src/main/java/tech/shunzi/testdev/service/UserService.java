@@ -17,4 +17,8 @@ public interface UserService {
     AddressDto findAddressDto(String userGuid);
 
     AddressDto addAddress(AddressDto addressDto);
+
+    List<UserDto> saveUserInBatchWithMethodTransaction(List<UserDto> userDtos);
+
+    List<UserDto> saveUserInBatchWithoutTransaction(List<UserDto> userDtos);
 }

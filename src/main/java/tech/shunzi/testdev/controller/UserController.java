@@ -13,6 +13,7 @@ import tech.shunzi.testdev.repo.UserTestRepository;
 import tech.shunzi.testdev.service.UserService;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -53,4 +54,31 @@ public class UserController {
     {
         return new ResponseEntity<>(userService.addAddress(addressDto), HttpStatus.OK);
     }
+
+    @GetMapping("/test-method-transaction")
+    public ResponseEntity<List<UserDto>> createUsers()
+    {
+        return new ResponseEntity<>(userService.saveUserInBatchWithMethodTransaction(getUserDtos()), HttpStatus.OK);
+    }
+
+    @GetMapping("/test-no-transaction")
+    public ResponseEntity<List<UserDto>> createUsersWithoutTrans()
+    {
+        return new ResponseEntity<>(userService.saveUserInBatchWithoutTransaction(getUserDtos()), HttpStatus.OK);
+    }
+
+    private List<UserDto> getUserDtos() {
+        List<UserDto> userDtoList = new ArrayList<>();
+        UserDto userDtoOne = new UserDto();
+        userDtoOne.setIntroduction("intro");
+        userDtoOne.setName("name");
+        userDtoOne.setId(12212);
+        UserDto userDtoTwo = new UserDto();
+        userDtoTwo.setIntroduction("intro");
+        userDtoTwo.setName("name");
+        userDtoList.add(userDtoOne);
+        userDtoList.add(userDtoTwo);
+        return userDtoList;
+    }
+
 }

@@ -80,6 +80,17 @@ public class UserServiceImpl implements UserService, TestMultiInject {
         return findAddressDto(userGuid);
     }
 
+    @Override
+    @Transactional
+    public List<UserDto> saveUserInBatchWithMethodTransaction(List<UserDto> userDtos) {
+        return userDtos.stream().map(this::saveUser).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> saveUserInBatchWithoutTransaction(List<UserDto> userDtos) {
+        return userDtos.stream().map(this::saveUser).collect(Collectors.toList());
+    }
+
     public UserDto populate(User user) {
         UserDto userDto = new UserDto();
         if (null != user.getId()) {
